@@ -19,27 +19,101 @@ app.use ( express.static ( publicDirPath ) )
 app.use ( express.json () )
 
 // HTTP end point to create user
-app.post ( '/users', ( req, res ) => {
+app.post ( '/users', async ( req, res ) => {
+
     const user = new User ( req.body )
 
-    // Save to mongodb database
-    user.save().then ( ( user ) => {
-        res.status ( 201 ).send ( user )
-    } ).catch ( ( error ) => {
+    try {
+        await user.save ()
+        res.status ( 201 ).send ( savedUser )
+    } catch ( error ) {
         res.status ( 400 ).send ( error )
-    } )
+    }
+
+} )
+
+// HTTP end point to read multiple users
+app.get ( '/users', async ( req, res ) => {
+
+    try {
+
+        const users = await User.find ( {} )
+        if ( !users.length ) {
+            return res.sendStatus ( 404 )
+        }
+    
+        res.send ( users )
+    } catch ( error ) {
+        res.status ( 500 ).send ( error )
+    } 
+    
+} )
+
+// HTTP end point to read a single user
+app.get ( '/users/:id', async ( req, res ) => {
+
+    const _id = req.params.id
+
+    try {
+        const user = await User.findById ( _id )
+        if ( !user ) {
+            return res.sendStatus ( 404 )
+        }
+        res.status ( 200 ).send ( user )
+
+    } catch ( error ) {
+        res.status ( 500 ).send ( error )
+    }
 
 } )
 
 // HTTP end point to create a task
-app.post ( '/tasks', ( req, res ) => {
+app.post ( '/tasks', async ( req, res ) => {
+
     const task = new Task ( req.body )
 
-    task.save ().then ( ( task ) => {
+    try {
+        await task.save ()
         res.status( 201 ).send ( task )
-    } ).catch ( ( error ) => {
+    } catch ( error ) {
         res.status( 400 ).send ( error )
-    } )
+    }
+
+} )
+
+// HTTP end point to read multiple tasks
+app.get ( '/tasks', async ( req, res ) => {
+
+    try {
+
+        const tasks = await Task.find ( {} )
+        if ( !tasks.length ) {
+            return res.sendStatus ( 404 )
+        }
+        res.send ( tasks )
+
+    } catch ( error ) {
+        res.status ( 500 ).send ( error )
+    }
+
+} )
+
+// HTTP end point to read a task
+app.get ( '/tasks/:id', async ( req, res ) => {
+
+    const _id = req.params.id
+
+    try {
+        const task = await Task.findById ( _id )
+        if ( !task ) {
+            return res.sendStatus ( 404 )
+        }
+        res.send ( task )
+
+    } catch ( error ) {
+        res.status ( 500 ).send ( error )
+    }
+
 } )
 
 app.listen ( port, () => {
