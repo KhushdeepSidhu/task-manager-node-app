@@ -3,6 +3,18 @@ const User = require ( '../models/user' )
 
 const router = new express.Router ()
 
+// HTTP end point to login 
+router.post ( '/users/login', async ( req, res ) => {
+
+    try {
+        const user = await User.findByCredentials ( req.body.email, req.body.password )
+        res.send ( user )
+    } catch ( error ) {
+        res.status ( 400 ).send ( error )
+    }
+
+} )
+
 // HTTP end point to create user
 router.post ( '/users', async ( req, res ) => {
 
@@ -56,20 +68,21 @@ router.get ( '/users/:id', async ( req, res ) => {
 router.patch ( '/users/:id', async ( req, res ) => {
 
     const updates = Object.keys ( req.body )
-    console.log ( updates )
     const allowedUpdates = [ 'name', 'age', 'email', 'password' ]
     const isValidOperation = updates.every ( ( update ) => allowedUpdates.includes ( update ) )
-
+    console.log ( isValidOperation )
     if ( !isValidOperation ) {
         return res.status( 400 ).send ( 'Invalid Updates' )
     }
 
     try {
-        const user = await User.findByIdAndUpdate ( req.params.id, req.body, { new: true, runValidators: true } )
+        const user = await User.findById ( req.params.id )
         if ( !user ) {
             return res.sendStatus ( 404 )
         }
-        res.send ( user )
+        updates.forEach ( ( update ) => user [ update ] = req.body [ update ] )
+        const savedUser = await user.save ()
+        res.send ( savedUser )
     } catch ( error ) {
         res.status ( 400 ).send ( error )
     }
