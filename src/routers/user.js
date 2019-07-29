@@ -1,4 +1,5 @@
 const express = require ( 'express' )
+const auth = require ( '../middleware/auth' )
 const User = require ( '../models/user' )
 
 const router = new express.Router ()
@@ -8,7 +9,8 @@ router.post ( '/users/login', async ( req, res ) => {
 
     try {
         const user = await User.findByCredentials ( req.body.email, req.body.password )
-        res.send ( user )
+        const token = await user.generateAuthToken ()
+        res.send ( { user, token } )
     } catch ( error ) {
         res.status ( 400 ).send ( error )
     }
@@ -21,8 +23,9 @@ router.post ( '/users', async ( req, res ) => {
     const user = new User ( req.body )
 
     try {
+        const token = await user.generateAuthToken ()
         const savedUser = await user.save ()
-        res.status ( 201 ).send ( savedUser )
+        res.status ( 201 ).send ( { savedUser, token } )
     } catch ( error ) {
         res.status ( 400 ).send ( error )
     }
@@ -30,19 +33,9 @@ router.post ( '/users', async ( req, res ) => {
 } )
 
 // HTTP end point to read multiple users
-router.get ( '/users', async ( req, res ) => {
+router.get ( '/users/me', auth, async ( req, res ) => {
 
-    try {
-
-        const users = await User.find ( {} )
-        if ( !users.length ) {
-            return res.sendStatus ( 404 )
-        }
-    
-        res.send ( users )
-    } catch ( error ) {
-        res.status ( 500 ).send ( error )
-    } 
+    res.send ( req.user )
     
 } )
 
