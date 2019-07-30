@@ -32,7 +32,7 @@ router.post ( '/users', async ( req, res ) => {
 
 } )
 
-// HTTP end point to read multiple users
+// HTTP end point to read user profile
 router.get ( '/users/me', auth, async ( req, res ) => {
 
     res.send ( req.user )
@@ -78,6 +78,36 @@ router.patch ( '/users/:id', async ( req, res ) => {
         res.send ( savedUser )
     } catch ( error ) {
         res.status ( 400 ).send ( error )
+    }
+
+} )
+
+// HTTP end point to log out a user 
+router.post( '/users/logout', auth, async ( req, res ) => {
+
+    try {
+        const user = req.user
+        const token = req.token
+        user.tokens = user.tokens.filter ( ( element ) => element.token !== token )
+        await user.save()
+        res.send ()
+    } catch ( error ) {
+        res.status( 400 ).send ( error )
+    }
+    
+} )
+
+// HTTP end point to logout user from all session
+router.post( '/users/logoutAll', auth, async ( req, res ) => {
+
+    try {
+        const user = req.user
+        const token = req.token  
+        user.tokens = []
+        await user.save()
+        res.send ()
+    } catch ( error ) {
+        res.status( 400 ).send ( error )
     }
 
 } )
