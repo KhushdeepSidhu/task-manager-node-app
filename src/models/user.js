@@ -50,6 +50,13 @@ const userSchema = new mongoose.Schema ( {
     } ]
 } )
 
+// User-Task relationship
+userSchema.virtual ( 'tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+} )
+
 // Hash password before saving the user
 userSchema.pre ( 'save', async function ( next ) {
     const user = this
@@ -78,6 +85,19 @@ userSchema.statics.findByCredentials = async ( email, password ) => {
     }
 
     return user
+
+}
+
+// Hide private data
+userSchema.methods.toJSON = function () {
+
+    const user = this
+    const userObject = user.toObject()
+
+    delete userObject.password
+    delete userObject.tokens
+
+    return userObject
 
 }
 
