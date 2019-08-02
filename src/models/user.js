@@ -2,6 +2,7 @@ const mongoose = require ( 'mongoose' )
 const validator = require ( 'validator' )
 const bcrypt = require ( 'bcryptjs' )
 const jwt = require ( 'jsonwebtoken' )
+const Task = require ( './task' )
 
 // User schema to use middleware 
 const userSchema = new mongoose.Schema ( {
@@ -48,6 +49,8 @@ const userSchema = new mongoose.Schema ( {
             required: true
         }
     } ]
+}, {
+    timestamps: true    
 } )
 
 // User-Task relationship
@@ -66,6 +69,16 @@ userSchema.pre ( 'save', async function ( next ) {
     }
 
     next ()
+
+} )
+
+// Delete tasks before removing a user 
+userSchema.pre ( 'remove', async function ( next ) {
+
+    const user = this 
+    await Task.deleteMany ( { owner: user._id } )
+
+    next()
 
 } )
 
