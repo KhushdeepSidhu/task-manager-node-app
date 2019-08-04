@@ -1,6 +1,7 @@
 const express = require ( 'express' )
 const auth = require ( '../middleware/auth' )
 const User = require ( '../models/user' )
+const multer = require ( 'multer' )
 
 const router = new express.Router ()
 
@@ -117,6 +118,23 @@ router.delete ( '/users/me', auth, async ( req, res ) => {
         res.sendStatus ( 500 )
     }
 
+} )
+
+// HTTP end point upload a picture
+const upload = multer ( {
+    dest: 'avatars',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter ( req, file, callback ) {
+        if ( !file.originalname.match ( /\.(jpg|jpeg|png)$/ ) ) {
+            return callback ( new Error ( 'Please upload an image file.' ) )
+        }
+        callback ( undefined, true )
+    }
+} )
+router.post( '/users/me/avatar', upload.single ( 'avatar' ), ( req, res ) => {
+    res.send ()
 } )
 
 module.exports = router

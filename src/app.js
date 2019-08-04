@@ -12,6 +12,26 @@ const publicDirPath = path.join ( __dirname, '../public' )
 // configure port to make the application on heroku also
 const port = process.env.PORT || 3000
 
+const multer = require ( 'multer' )
+const upload = multer ( {
+    dest: 'images',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter( req, file, callback ) {
+        if ( !file.originalname.match ( /\.(doc|docx)$/ ) ) {
+            return callback ( new Error ( 'Please upload a Word document.' ) )
+        }
+        callback ( undefined, true )
+    }
+} )
+
+app.post ( '/upload', upload.single ( 'upload' ), async ( req, res ) => {
+    res.send()
+} )
+
+
+
 // Setup static directory to serve
 app.use ( express.static ( publicDirPath ) )
 
