@@ -2,6 +2,7 @@ const express = require ( 'express' )
 const auth = require ( '../middleware/auth' )
 const User = require ( '../models/user' )
 const multer = require ( 'multer' )
+const sharp = require ( 'sharp' )
 
 const router = new express.Router ()
 
@@ -133,7 +134,8 @@ const upload = multer ( {
     }
 } )
 router.post( '/users/me/avatar', auth, upload.single ( 'avatar' ), async ( req, res ) => {
-    req.user.avatar = req.file.buffer
+    const buffer = await sharp ( req.file.buffer ).resize ( { height: 250, width: 250 } ).png().toBuffer()
+    req.user.avatar = buffer
     await req.user.save()
     res.send ()
 }, ( error, req, res, next ) => {
@@ -142,7 +144,7 @@ router.post( '/users/me/avatar', auth, upload.single ( 'avatar' ), async ( req, 
 
 // HTTP end point to delete the avatar
 router.delete ( '/users/me/avatar', auth, async ( req, res ) => {
-    
+
     try {
         req.user.avatar = undefined
         await req.user.save()
@@ -151,6 +153,22 @@ router.delete ( '/users/me/avatar', auth, async ( req, res ) => {
         res.status ( 400 ).send ( error )
     }
     
+} )
+
+// HTTP end point to serve up the avatar image
+router.get ( '/users/:id/avatar', async ( req, res ) => {
+
+    try {
+        const user = await User.findById ( req.params.id )
+        if ( !user || !user.avatar ) {
+            throw new Error ()
+        }
+        res.set ( 'Content-Type', 'image/png' )
+        res.send ( user.avatar )
+    } catch ( error ) {
+        res.status ( 404 ).send ()
+    }
+
 } )
 
 module.exports = router
