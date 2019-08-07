@@ -3,7 +3,7 @@ const auth = require ( '../middleware/auth' )
 const User = require ( '../models/user' )
 const multer = require ( 'multer' )
 const sharp = require ( 'sharp' )
-
+const { sendWelcomeEmail, sendCancelEmail } = require ( '../emails/account' )
 const router = new express.Router ()
 
 // HTTP end point to login 
@@ -27,6 +27,7 @@ router.post ( '/users', async ( req, res ) => {
     try {
         const token = await user.generateAuthToken ()
         const savedUser = await user.save ()
+        sendWelcomeEmail ( user.email, user.name )
         res.status ( 200 ).send ( { savedUser, token } )
     } catch ( error ) {
         res.status ( 400 ).send ( error )
@@ -113,6 +114,7 @@ router.post( '/users/logoutAll', auth, async ( req, res ) => {
 router.delete ( '/users/me', auth, async ( req, res ) => {
 
     try {
+        sendCancelEmail ( req.user.email, req.user.name )
         await req.user.remove()
         res.send ( req.user )
     } catch ( error ) {
