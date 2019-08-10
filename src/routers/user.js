@@ -116,7 +116,7 @@ router.delete ( '/users/me', auth, async ( req, res ) => {
     try {
         sendCancelEmail ( req.user.email, req.user.name )
         await req.user.remove()
-        res.send ( req.user )
+        res.send ( { user: req.user } )
     } catch ( error ) {
         res.sendStatus ( 500 )
     }

@@ -4,7 +4,11 @@
   "main": "app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "env-cmd ./config/dev.env nodemon src/app.js"
+    "dev": "env-cmd ./config/dev.env nodemon src/index.js",
+    "test": "env-cmd ./config/test.env jest --watch --runInBand"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "license": "MIT",
   "dependencies": {
@@ -16,10 +20,12 @@
     "mongoose": "5.6.0",
     "multer": "1.4.2",
     "sharp": "0.23.0",
+    "supertest": "3.4.1",
     "validator": "11.0.0"
   },
   "devDependencies": {
     "env-cmd": "8.0.2",
+    "jest": "24.8.0",
     "nodemon": "^1.19.1"
   }
 }
