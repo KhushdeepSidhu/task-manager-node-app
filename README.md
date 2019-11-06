@@ -105,7 +105,7 @@ The goal of this project is to create a RESTful API which can be consumed by fro
 git clone https://github.com/KhushdeepSidhu/task-manager-node-app.git
 
 # install the packages with npm or yarn
-cd expensify-react-app
+cd task-manager-note-app
 npm install 
 # or yarn 
 yarn install 
