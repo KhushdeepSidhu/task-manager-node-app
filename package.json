@@ -4,7 +4,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "env-cmd ./config/dev.env nodemon --inspect-brk src/index.js",
+    "dev": "env-cmd ./config/dev.env nodemon src/index.js",
     "test": "env-cmd ./config/test.env jest --watch --runInBand"
   },
   "jest": {
@@ -17,7 +17,7 @@
     "express": "4.17.1",
     "jsonwebtoken": "8.5.1",
     "mongodb": "3.2.7",
-    "mongoose": "5.6.0",
+    "mongoose": "^8.8.1",
     "multer": "1.4.2",
     "sharp": "^0.33.5",
     "supertest": "3.4.1",
